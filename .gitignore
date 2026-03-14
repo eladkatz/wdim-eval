@@ -1,0 +1,23 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Fixtures (generated locally, may contain copyrighted transcriptions)
+fixtures/
+*.wav
+*.m4b
+
+# macOS
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
