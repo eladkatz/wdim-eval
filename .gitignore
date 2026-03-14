@@ -9,6 +9,7 @@ build/
 
 # Jupyter
 .ipynb_checkpoints/
+notebooks/results/
 
 # Fixtures (generated locally, may contain copyrighted transcriptions)
 fixtures/
