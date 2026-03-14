@@ -452,6 +452,63 @@ df = await run_comparison(window, ["current_bullets", "v2_narrative"])
 
 ---
 
+## How to Use This Tool to Improve WDIM
+
+This section describes the end-to-end workflow for using the eval playground to develop better prompts and bring them back into the AudioBook Player app.
+
+### The iteration cycle
+
+```
+1. Identify a problem     →  "The WDIM summary is too vague / misses key plot points / hallucinates"
+2. Reproduce in playground →  Load the same chapter + position in notebook 03, run the current prompt
+3. Iterate on the prompt   →  Edit the custom prompt cell, re-run, compare outputs
+4. Validate with grounding →  Check that the new prompt's output traces back to the transcript
+5. Test across chapters    →  Run notebook 04 to compare the new prompt on multiple chapters
+6. Port back to Swift      →  Copy the prompt strings into MissedSummaryService.swift
+7. Test on device          →  Build and run the app, verify the improvement on real playback
+```
+
+### Step-by-step: improving a prompt
+
+**1. Start with a real problem.** Play an audiobook in the app, trigger WDIM, and note what's wrong with the output (too vague, wrong tone, hallucinated details, missing key events).
+
+**2. Set up the same scenario in the playground.** In notebook 03, set `book_slug`, `chapter_index`, `position_seconds`, and `window_minutes` to match roughly where you were in the book. Run all cells to see what the current prompt produces.
+
+**3. Edit the custom prompt cell.** Change `custom_system` and `custom_user` to try a new approach. Press Shift+Enter to re-run just that cell. You'll see the FM response in ~5 seconds instead of having to rebuild and deploy the app. Try multiple variations.
+
+**4. Check grounding.** The grounding check cell shows whether each sentence in the response can be traced to the transcript. Low grounding scores suggest hallucination — tighten the prompt to discourage it.
+
+**5. Test robustness.** Once you have a promising prompt, add it as a named variant in `lib/prompts.py` and run notebook 04 to compare it against existing variants across different chapters. A good prompt should work well on dialogue-heavy chapters, exposition, and action scenes.
+
+**6. Port to Swift.** The prompt strings in `prompts.py` are formatted identically to the Swift code in `MissedSummaryService.swift`. Copy the system and user prompt strings directly. The `{transcript}` placeholder in Python maps to string interpolation in Swift.
+
+**7. Update token budgets if needed.** If your new prompt is longer or shorter than the old one, check the token budget analysis in notebook 03. The `instruction_tokens` count tells you how much of the context window your prompt consumes, leaving the rest for transcript. Update `allocateTokenBudget()` in Swift if the balance has changed significantly.
+
+### What to test when changing prompts
+
+| Aspect | How to test | What to look for |
+|--------|-------------|------------------|
+| **Accuracy** | Grounding check in notebook 03 | Scores above 0.6 for each response sentence |
+| **Tone** | Read the response — does it sound natural? | Conversational vs robotic, appropriate for "welcome back" moment |
+| **Coverage** | Compare response to transcript | Does it mention the key events, not just minor details? |
+| **Length** | Token count of response | 2-4 sentences is ideal; too long feels like a lecture |
+| **Robustness** | Run on 3+ different chapters via notebook 04 | Consistent quality across dialogue, exposition, and action |
+| **Token efficiency** | Token budget analysis | Instruction tokens should be <30% of context window |
+
+### What to test when changing token budgets
+
+If you change `window_minutes` or the context allocation strategy, use the calibration cell in notebook 03 to verify you're within the real FM context limit. The tiktoken estimate is a proxy — the calibration gives you the actual boundary.
+
+### Keeping prompts in sync
+
+`lib/prompts.py` is the **source of truth** for prompt development. The Swift code in `MissedSummaryService.swift` is the **production copy**. After porting a prompt:
+
+1. Add a comment in the Swift code noting which variant from `prompts.py` it came from
+2. Update the variant's status in the `PROMPTS` table in `prompts.py` from "Experimental" to "Production"
+3. If you modify the Swift prompt further on-device, back-port those changes to `prompts.py` to keep them in sync
+
+---
+
 ## Relationship to Other Docs
 
 These documents live in the parent AudioBook Player project (`docs/technical/`):
