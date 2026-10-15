@@ -22,3 +22,15 @@ fixtures/
 # IDE
 .vscode/
 .idea/
+
+# WDIM regression kit: private inputs and outputs stay local
+regression/private/
+regression/books/
+regression/*.json
+regression/*.jsonl
+regression/*.log
+regression/guardtest
+regression/arms/armstest
+DeviceEval/Resources/*.json
+DeviceEval/build/
+DeviceEval/*.xcodeproj/
