@@ -34,3 +34,5 @@ regression/arms/armstest
 DeviceEval/Resources/*.json
 DeviceEval/build/
 DeviceEval/*.xcodeproj/
+
+regression/surfaces/surfacestest

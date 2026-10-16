@@ -19,7 +19,7 @@ def row(name, items):
         return
     mis = sum(g["misleading"] for _, g in items)
     clean = sum(1 for _, g in items if g["major_count"] == 0 and g["minor_count"] == 0)
-    fmt = sum(g.get("format_issue", False) for _, g in items)
+    fmt = sum(bool(g.get("format_issue")) for _, g in items)
     tog = [(k, g) for k, g in items if k["case"] in TOG]
     tog_mis = sum(g["misleading"] for _, g in tog)
     print(f"{name:22s} n={n:3d}  misleading {mis:3d} ({mis / n:4.0%})  clean {clean:3d} ({clean / n:4.0%})  "

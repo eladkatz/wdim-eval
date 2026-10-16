@@ -20,6 +20,8 @@ swiftc -O main.swift -o guardtest            # default vs permissive guardrails
 swiftc -O arms/main.swift -o arms/armstest   # per-prompt instructions, permissive guardrails
 python3 build_arms.py && ./arms/armstest arms_passages.json 3 arms_results.jsonl
 python3 build_sweep.py && ./arms/armstest mac_sweep_jobs.json 3 mac_sweep_results.jsonl
+swiftc -O surfaces/main.swift -o surfaces/surfacestest   # per-prompt token caps
+python3 build_surfaces.py && ./surfaces/surfacestest surface_jobs.json 3 surface_results.jsonl  # Last Moments, widget, bookmarks
 ```
 
 macOS 26.x runs the iOS 26.4-era 3B model. macOS 27 on an M3+/12 GB Mac runs the 20B model (`contextSize` 8192). Updating macOS replaces the model, so older generations can only be retested on a device that still runs them.
